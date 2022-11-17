@@ -35,12 +35,12 @@ SE_IF_region_ROM_end           = SE_IF_region_ROM_start + 0xEFF;
 
 /* SBSFU Code region */
 SB_region_ROM_start            = SE_IF_region_ROM_end + 0x1;
-SB_region_ROM_end              = 0x08012FFF;
+SB_region_ROM_end              = 0x08010FFF;
 
 /* KMS Data Storage (NVMS) region protected area */
 /* KMS Data Storage need for 2 images : 4 kbytes * 2 ==> 8 kbytes */
-KMS_DataStorage_start          = 0x08013000;
-KMS_DataStorage_end            = 0x08014FFF;
+KMS_DataStorage_start          = 0x08011000;
+KMS_DataStorage_end            = 0x08012FFF;
 
 /* ROM regions size definition */
 SE_CallGate_region_ROM_size    = SE_CallGate_region_ROM_end - SE_CallGate_region_ROM_start + 0x1;
