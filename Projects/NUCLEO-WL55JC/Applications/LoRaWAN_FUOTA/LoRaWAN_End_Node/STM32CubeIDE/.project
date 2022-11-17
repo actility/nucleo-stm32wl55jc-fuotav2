@@ -38,6 +38,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/readme.txt</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/SmartDelta</name>
+			<type>2</type>
+			<location>C:/Users/OlegTabarovskiy/STM32CubeIDE/fuota20/stm32cube_fw2_wl/Middlewares/Third_Party/SmartDelta</location>
+		</link>
+		<link>
 			<name>Utilities/stm32_adv_trace.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Utilities/trace/adv_trace/stm32_adv_trace.c</locationURI>

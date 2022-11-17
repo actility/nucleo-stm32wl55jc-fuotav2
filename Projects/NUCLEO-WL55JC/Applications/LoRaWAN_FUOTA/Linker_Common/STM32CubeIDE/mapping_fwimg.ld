@@ -5,15 +5,21 @@
 /* Slots must be aligned on sector size */
 
 /* Swap sector : 4 kbytes */  
-SWAP_start           = 0x08015000;  
-SWAP_end             = 0x08015FFF;
+/* SWAP_start           = 0x08015000;  */
+/* SWAP_end             = 0x08015FFF; */
+SWAP_start           = 0x08013000;  
+SWAP_end             = 0x08013FFF;
 
 /* Dwl slot #1 : (80 kbytes) */
-SLOT_Dwl_1_start     = 0x08016000;
-SLOT_Dwl_1_end       = 0x08029FFF;
+/* SLOT_Dwl_1_start     = 0x08016000; */
+/* SLOT_Dwl_1_end       = 0x08029FFF; */
+SLOT_Dwl_1_start     = 0x08014000;
+SLOT_Dwl_1_end       = 0x08028FFF;
 
 /* Active slot #1 (80 kbytes) */
-SLOT_Active_1_start  = 0x0802A000;  
+/* SLOT_Active_1_start  = 0x0802A000; */ 
+/* SLOT_Active_1_end    = 0x0803DFFF; */
+SLOT_Active_1_start  = 0x08029000;  
 SLOT_Active_1_end    = 0x0803DFFF;
 SLOT_Active_1_header = SLOT_Active_1_start;
 

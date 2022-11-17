@@ -669,7 +669,12 @@ static void SendTxData(void)
   if (EventType == TX_ON_TIMER)
   {
     UTIL_TIMER_Stop(&TxTimer);
+#if (ACTILITY_SMARTDELTA == 1)
+    /* Add randomness to uplink periodicity */
+    UTIL_TIMER_SetPeriod(&TxTimer, MAX(nextTxIn, TxPeriodicity + randr(-APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND)));
+#else
     UTIL_TIMER_SetPeriod(&TxTimer, MAX(nextTxIn, TxPeriodicity));
+#endif /* ACTILITY_SMARTDELTA == 1 */
     UTIL_TIMER_Start(&TxTimer);
   }
 

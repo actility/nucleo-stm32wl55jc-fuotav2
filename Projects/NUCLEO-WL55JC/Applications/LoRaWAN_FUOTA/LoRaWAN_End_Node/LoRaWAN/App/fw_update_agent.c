@@ -67,7 +67,11 @@
 
 /* Exported functions --------------------------------------------------------*/
 #if (INTEROP_TEST_MODE == 0)
+#if (ACTILITY_SMARTDELTA == 1)
+void FwUpdateAgent_Run(bool reset)
+#else /* ACTILITY_SMARTDELTA == 0 */
 void FwUpdateAgent_Run(void)
+#endif /* ACTILITY_SMARTDELTA == 1 */
 {
   /* USER CODE BEGIN FwUpdateAgent_Run_1 */
 
@@ -91,9 +95,14 @@ void FwUpdateAgent_Run(void)
   if (status == FLASH_IF_OK)
   {
 #if ( LORAWAN_PACKAGES_VERSION == 1 )
-    /* only required without Firmware Management protocol */
-    /* System Reboot*/
-    NVIC_SystemReset();
+#if (ACTILITY_SMARTDELTA == 1)
+    if (reset) {
+#endif /* ACTILITY_SMARTDELTA == 1 */
+      /* System Reboot*/
+      NVIC_SystemReset();
+#if (ACTILITY_SMARTDELTA == 1)
+    }
+#endif /* ACTILITY_SMARTDELTA == 1 */
 #endif /* LORAWAN_PACKAGES_VERSION */
   }
   else

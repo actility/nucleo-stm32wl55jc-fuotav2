@@ -1,10 +1,10 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    app_version.h
+  * @file    mw_log_conf.h
   * @author  MCD Application Team
-  * @brief   Definition the version of the application
-  ******************************************************************************
+  * @brief   Configure (enable/disable) traces
+  *******************************************************************************
   * @attention
   *
   * Copyright (c) 2021 STMicroelectronics.
@@ -19,14 +19,15 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_VERSION_H__
-#define __APP_VERSION_H__
+#ifndef __MW_LOG_CONF_H__
+#define __MW_LOG_CONF_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32_adv_trace.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -38,15 +39,7 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-#define APP_VERSION_MAIN   (0x01U) /*!< [31:24] main version */
-#define APP_VERSION_SUB1   (0x03U) /*!< [23:16] sub1 version */
-#define APP_VERSION_SUB2   (0x01U) /*!< [15:8]  sub2 version */
-#define APP_VERSION_RC     (0x00U) /*!< [7:0]  release candidate */
-
-#define APP_VERSION_MAIN_SHIFT 24  /*!< main byte shift */
-#define APP_VERSION_SUB1_SHIFT 16  /*!< sub1 byte shift */
-#define APP_VERSION_SUB2_SHIFT 8   /*!< sub2 byte shift */
-#define APP_VERSION_RC_SHIFT   0   /*!< release candidate byte shift */
+#define MW_LOG_ENABLED
 
 /* USER CODE BEGIN EC */
 
@@ -57,15 +50,12 @@ extern "C" {
 
 /* USER CODE END EV */
 
-/* Exported macros -----------------------------------------------------------*/
-/**
-  * @brief Application version
-  */
-#define APP_VERSION         ((APP_VERSION_MAIN  << APP_VERSION_MAIN_SHIFT)\
-                             |(APP_VERSION_SUB1 << APP_VERSION_SUB1_SHIFT)\
-                             |(APP_VERSION_SUB2 << APP_VERSION_SUB2_SHIFT)\
-                             |(APP_VERSION_RC   << APP_VERSION_RC_SHIFT))
-
+/* Exported macro ------------------------------------------------------------*/
+#ifdef MW_LOG_ENABLED
+#define MW_LOG(TS,VL, ...)   do{ {UTIL_ADV_TRACE_COND_FSend(VL, T_REG_OFF, TS, __VA_ARGS__);} }while(0)
+#else  /* MW_LOG_ENABLED */
+#define MW_LOG(TS,VL, ...)
+#endif /* MW_LOG_ENABLED */
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
@@ -79,4 +69,4 @@ extern "C" {
 }
 #endif
 
-#endif /*__APP_VERSION_H__*/
+#endif /*__MW_LOG_CONF_H__ */

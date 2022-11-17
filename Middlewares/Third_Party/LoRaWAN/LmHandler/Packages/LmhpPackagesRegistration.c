@@ -55,7 +55,7 @@ LmHandlerErrorStatus_t LmhpPackagesRegistrationInit( Version_t *fwVersion )
     {
         return LORAMAC_HANDLER_ERROR;
     }
-#if (LORAWAN_PACKAGES_VERSION == 2)
+#if (LORAWAN_PACKAGES_VERSION == 2 || ACTILITY_SMARTDELTA == 1)
     else if( LmHandlerPackageRegister( PACKAGE_ID_FIRMWARE_MANAGEMENT, fwVersion ) != LORAMAC_HANDLER_SUCCESS )
     {
         return LORAMAC_HANDLER_ERROR;
