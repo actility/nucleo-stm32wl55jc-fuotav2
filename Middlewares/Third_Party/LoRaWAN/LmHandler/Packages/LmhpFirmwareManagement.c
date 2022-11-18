@@ -24,6 +24,12 @@
 #include "LmhpFirmwareManagement.h"
 #include "fw_update_agent.h"
 #include "mw_log_conf.h"  /* needed for MW_LOG */
+#if (ACTILITY_SMARTDELTA == 1)
+/*#include "lora_app_version.h"*/
+#include "frag_decoder_if.h"
+#include "fw_update_agent.h"
+#include "sys_app.h"
+#endif /* ACTILITY_SMARTDELTA == 1 */
 
 /* Private typedef -----------------------------------------------------------*/
 /*!
@@ -36,6 +42,12 @@ typedef struct LmhpFirmwareManagementState_s
     uint8_t DataBufferMaxSize;
     uint8_t *DataBuffer;
     Version_t fwVersion;
+#if (ACTILITY_SMARTDELTA == 1)
+    bool DevVersionAnsSentOnBoot;
+    bool IsRebootScheduled;
+    LmhpFirmwareManagementUpImageStatus_t NewImageStatus;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
 } LmhpFirmwareManagementState_t;
 
 typedef enum LmhpFirmwareManagementMoteCmd_e
@@ -58,6 +70,7 @@ typedef enum LmhpFirmwareManagementSrvCmd_e
     FW_MANAGEMENT_DEV_DELETE_IMAGE_REQ         = 0x05,
 } LmhpFirmwareManagementSrvCmd_t;
 
+#if ( ACTILITY_SMARTDELTA == 0 )
 typedef enum LmhpFirmwareManagementUpImageStatus_e
 {
     FW_MANAGEMENT_NO_PRESENT_IMAGE             = 0x00,
@@ -65,6 +78,7 @@ typedef enum LmhpFirmwareManagementUpImageStatus_e
     FW_MANAGEMENT_INCOMPATIBLE_IMAGE           = 0x02,
     FW_MANAGEMENT_VALID_IMAGE                  = 0x03,
 } LmhpFirmwareManagementUpImageStatus_t;
+#endif /* ACTILITY_SMARTDELTA == 1 */
 /* Private define ------------------------------------------------------------*/
 /*!
  * LoRaWAN Application Layer Remote multicast setup Specification
@@ -73,6 +87,16 @@ typedef enum LmhpFirmwareManagementUpImageStatus_e
 #define FW_MANAGEMENT_ID                            4
 #define FW_MANAGEMENT_VERSION                       1
 #define HW_VERSION                                  0x00000000 /* Not yet managed */
+
+#if (ACTILITY_SMARTDELTA == 1)
+/*
+ * Originally used BlkAckDelay, but we can't transfer it through
+ * reboot so define it here and use this parameters
+ */
+#define DEVVERSIONANSMIN                            16  /* min delay seconds */
+#define DEVVERSIONANSMAX                            128 /* max delay seconds */
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
 
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -115,11 +139,21 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
 
 static void OnRebootTimer( void *context );
 
+#if ( ACTILITY_SMARTDELTA == 1 )
+static void OnDevVersionAnsTimerEvent( void *context );
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
 /* Private variables ---------------------------------------------------------*/
 static LmhpFirmwareManagementState_t LmhpFirmwareManagementState =
 {
     .Initialized = false,
     .IsTxPending = false,
+#if ( ACTILITY_SMARTDELTA == 1 )
+	.DevVersionAnsSentOnBoot = false,
+	.IsRebootScheduled = false,
+	.NewImageStatus = FW_MANAGEMENT_VALID_IMAGE,
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
 };
 
 static LmhPackage_t LmhpFirmwareManagementPackage =
@@ -147,11 +181,35 @@ static LmhPackage_t LmhpFirmwareManagementPackage =
  */
 static TimerEvent_t RebootTimer;
 
+#if ( ACTILITY_SMARTDELTA == 1 )
+/*!
+ * DevVersionAns at boot timer
+ */
+static TimerEvent_t DevVersionAnsTimer;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
+
 /* Exported functions ---------------------------------------------------------*/
 LmhPackage_t *LmhpFirmwareManagementPackageFactory( void )
 {
     return &LmhpFirmwareManagementPackage;
 }
+
+#if (ACTILITY_SMARTDELTA == 1)
+bool LmhpFirmwareManagementIsRebootScheduled(void)
+{
+  return LmhpFirmwareManagementState.IsRebootScheduled;
+}
+
+LmhpFirmwareManagementUpImageStatus_t LmhpFirmwareManagementGetImageStatus(void)
+{
+  return LmhpFirmwareManagementState.NewImageStatus;
+}
+
+void LmhpFirmwareManagementSetImageStatus(LmhpFirmwareManagementUpImageStatus_t imagestatus) {
+  LmhpFirmwareManagementState.NewImageStatus = imagestatus;
+}
+#endif /* ACTILITY_SMARTDELTA == 1 */
 
 /* Private  functions ---------------------------------------------------------*/
 static void LmhpFirmwareManagementInit( void *params, uint8_t *dataBuffer, uint8_t dataBufferMaxSize )
@@ -161,6 +219,12 @@ static void LmhpFirmwareManagementInit( void *params, uint8_t *dataBuffer, uint8
         LmhpFirmwareManagementState.DataBuffer = dataBuffer;
         LmhpFirmwareManagementState.DataBufferMaxSize = dataBufferMaxSize;
         LmhpFirmwareManagementState.Initialized = true;
+#if (ACTILITY_SMARTDELTA == 1)
+        LmhpFirmwareManagementState.DevVersionAnsSentOnBoot = false;
+        LmhpFirmwareManagementState.IsRebootScheduled = false;
+        LmhpFirmwareManagementState.NewImageStatus = FW_MANAGEMENT_NO_PRESENT_IMAGE;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
         TimerInit( &RebootTimer, OnRebootTimer );
     }
     else
@@ -181,9 +245,80 @@ static bool LmhpFirmwareManagementIsTxPending( void )
     return LmhpFirmwareManagementState.IsTxPending;
 }
 
+#if (ACTILITY_SMARTDELTA == 0)
 static void LmhpFirmwareManagementProcess( void )
 {
     /* Not yet implemented */
+}
+
+#else
+static void OnDevVersionAnsTimerEvent( void *context )
+{
+  uint8_t dataBufferIndex = 0;
+
+  MibRequestConfirm_t mibReq;
+
+  TimerStop(&DevVersionAnsTimer);
+  mibReq.Type = MIB_DEVICE_CLASS;
+  LoRaMacMibGetRequestConfirm( &mibReq );
+  if( mibReq.Param.Class != CLASS_A ) {
+       /*
+        * Do not interfere with CLASS_C or CLASS_B session,
+        * just skip sending DevVersionAns if we are not in CLASS_A
+        */
+        APP_LOG(TS_OFF, VLEVEL_M, "DevVersionAns canceled\r\n" );
+        return;
+  }
+
+  if( LmHandlerIsBusy( ) == true )
+  {
+    /* We will reschedule timer in Process() if stack is busy */
+    LmhpFirmwareManagementState.DevVersionAnsSentOnBoot = false;
+    return;
+  }
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FW_MANAGEMENT_DEV_VERSION_ANS;
+  /* FW Version */
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = LmhpFirmwareManagementState.fwVersion.Fields.Revision;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = LmhpFirmwareManagementState.fwVersion.Fields.Patch;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = LmhpFirmwareManagementState.fwVersion.Fields.Minor;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = LmhpFirmwareManagementState.fwVersion.Fields.Major;
+  /* HW Version */
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = (HW_VERSION >> 0) & 0xFF;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = (HW_VERSION >> 8) & 0xFF;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = (HW_VERSION >> 16) & 0xFF;
+  LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = (HW_VERSION >> 24) & 0xFF;
+  LmHandlerAppData_t appData = {
+    .Buffer = LmhpFirmwareManagementState.DataBuffer,
+    .BufferSize = dataBufferIndex,
+    .Port = FW_MANAGEMENT_PORT
+  };
+
+  bool current_dutycycle;
+  LmHandlerGetDutyCycleEnable( &current_dutycycle );
+
+  /* force Duty Cycle OFF to this Send */
+  LmHandlerSetDutyCycleEnable( false );
+  LmHandlerSend( &appData, LORAMAC_HANDLER_UNCONFIRMED_MSG, true );
+  APP_LOG(TS_OFF, VLEVEL_M, "DevVersionAns sent\r\n" );
+}
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
+static void LmhpFirmwareManagementProcess(void)
+{
+#if (ACTILITY_SMARTDELTA == 1)
+  int32_t delay = randr(DEVVERSIONANSMIN, DEVVERSIONANSMAX) * 1000;
+
+  // We have to send DevVersionAns on boot after random delay just once
+  if( LmhpFirmwareManagementState.DevVersionAnsSentOnBoot == false )
+  {
+    TimerInit( &DevVersionAnsTimer, OnDevVersionAnsTimerEvent );
+    TimerSetValue( &DevVersionAnsTimer, delay );
+    TimerStart( &DevVersionAnsTimer );
+    LmhpFirmwareManagementState.DevVersionAnsSentOnBoot = true;
+    APP_LOG(TS_OFF, VLEVEL_M, "DevVersionAns scheduled in %ums\r\n", delay );
+  }
+#endif /* ACTILITY_SMARTDELTA == 1 */
+  /* Not yet implemented */
 }
 
 static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndication )
@@ -239,6 +374,10 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
                     {
                         rebootTimeAns = rebootTimeReq;
                         TimerStop( &RebootTimer );
+#if ( ACTILITY_SMARTDELTA == 1 )
+                        LmhpFirmwareManagementState.IsRebootScheduled = false;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
                     }
                     else
                     {
@@ -251,6 +390,10 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
                             /* Start session start timer */
                             TimerSetValue( &RebootTimer, rebootTimeAns * 1000 );
                             TimerStart( &RebootTimer );
+#if ( ACTILITY_SMARTDELTA == 1 )
+                            LmhpFirmwareManagementState.IsRebootScheduled = true;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
                         }
                     }
 
@@ -277,6 +420,10 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
                     else if( rebootCountdown == 0xFFFFFF )
                     {
                         TimerStop( &RebootTimer );
+#if ( ACTILITY_SMARTDELTA == 1 )
+                        LmhpFirmwareManagementState.IsRebootScheduled = false;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
                     }
                     else
                     {
@@ -285,6 +432,10 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
                             /* Start session start timer */
                             TimerSetValue( &RebootTimer, rebootCountdown * 1000 );
                             TimerStart( &RebootTimer );
+#if ( ACTILITY_SMARTDELTA == 1 )
+                            LmhpFirmwareManagementState.IsRebootScheduled = false;
+#endif /* ACTILITY_SMARTDELTA == 1 */
+
                         }
                     }
                     LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FW_MANAGEMENT_DEV_REBOOT_COUNTDOWN_ANS;
@@ -297,7 +448,12 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
             case FW_MANAGEMENT_DEV_UPGRADE_IMAGE_REQ:
                 {
                     uint32_t imageVersion = 0;
+#if ( ACTILITY_SMARTDELTA == 0 )
                     uint8_t imageStatus = FW_MANAGEMENT_NO_PRESENT_IMAGE;
+#else /* ACTILITY_SMARTDELTA == 1 */
+                    uint8_t imageStatus = LmhpFirmwareManagementState.NewImageStatus;
+#endif
+
                     LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FW_MANAGEMENT_DEV_UPGRADE_IMAGE_ANS;
                     /* No FW present */
                     LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = imageStatus & 0x03;
@@ -321,9 +477,38 @@ static void LmhpFirmwareManagementOnMcpsIndication( McpsIndication_t *mcpsIndica
                     firmwareVersion += ( mcpsIndication->Buffer[cmdIndex++] << 24 ) & 0xFF000000;
 
                     LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FW_MANAGEMENT_DEV_DELETE_IMAGE_ANS;
-                    /* No valid image present */
-                    LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = 0x01;
-                    break;
+#if ( ACTILITY_SMARTDELTA == 0 )
+					/* No valid image present */
+					LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FWM_DEL_ERRORNOVALIDIMAGE;
+
+#else /* ACTILITY_SMARTDELTA == 1 */
+					APP_LOG(TS_OFF, VLEVEL_M, "Receive DevDeleteImageReq\r\n");
+					if( LmhpFirmwareManagementState.NewImageStatus != FW_MANAGEMENT_VALID_IMAGE )
+					{
+						LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = FWM_DEL_ERRORNOVALIDIMAGE;
+						APP_LOG(TS_OFF, VLEVEL_M, "DevDeleteImageReq: No valid image\r\n" );
+					} else {
+					/*
+					 * For now always delete existing image. Until decision
+					 * is made how to track downloaded image version
+					 *
+					 * if( LmhpFWManagementParams->NewImageFWVersion == firmwareVersion )
+					 * {
+					 */
+						FRAG_DECODER_IF_Erase();
+						LmhpFirmwareManagementState.DataBuffer[dataBufferIndex++] = 0;
+						LmhpFirmwareManagementState.NewImageStatus = FW_MANAGEMENT_NO_PRESENT_IMAGE;
+						APP_LOG(TS_OFF, VLEVEL_M, "DevDeleteImageReq: Image deleted\r\n");
+					  /*
+					   * } else {
+					   *     LmhpFWManagementState.DataBuffer[dataBufferIndex++] = FWM_DEL_ERRORINVALIDVERSION;
+					   *     APP_LOG(TS_OFF, VLEVEL_M, "DevDeleteImageReq: Invalid image version %x vs %x\r\n", firmwareVersion,
+					   *                     0 );
+					   * }
+					   */
+					   }
+#endif /* ACTILITY_SMARTDELTA == 0 */
+                       break;
                 }
             default:
                 {
@@ -361,6 +546,12 @@ static void OnRebootTimer( void *context )
 #if (LORAWAN_PACKAGES_VERSION == 2)
     FwUpdateAgent_Run();
 #endif /* LORAWAN_PACKAGES_VERSION */
+#if ( ACTILITY_SMARTDELTA == 1 && LORAWAN_PACKAGES_VERSION == 1)
+  if ( LmhpFirmwareManagementState.NewImageStatus == FW_MANAGEMENT_VALID_IMAGE )
+  {
+    FwUpdateAgent_Run(false);
+  }
+#endif /* ACTILITY_SMARTDELTA == 1 */
 #endif /* INTEROP_TEST_MODE */
 #if (defined( LORAMAC_VERSION ) && (( LORAMAC_VERSION == 0x01000400 ) || ( LORAMAC_VERSION == 0x01010100 )))
     if( LmhpFirmwareManagementPackage.OnSystemReset != NULL )

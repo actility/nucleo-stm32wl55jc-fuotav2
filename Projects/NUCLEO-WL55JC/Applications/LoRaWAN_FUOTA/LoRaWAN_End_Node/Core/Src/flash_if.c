@@ -222,6 +222,7 @@ static FLASH_IF_StatusTypedef FLASH_IF_INT_Write(void *pDestination, const void 
   uint32_t current_dest;
   uint32_t current_source;
   uint32_t current_length;
+  uint64_t src_value;
 
   if ((pDestination == NULL) || (pSource == NULL) || !IS_ADDR_ALIGNED_64BITS(uLength)
       || !IS_ADDR_ALIGNED_64BITS((uint32_t)pDestination))
@@ -283,12 +284,13 @@ static FLASH_IF_StatusTypedef FLASH_IF_INT_Write(void *pDestination, const void 
 
         for (address_offset = 0U; address_offset < current_length; address_offset += 8U)
         {
+
+          UTIL_MEM_cpy_8(&src_value, (uint8_t *)(current_source + address_offset), sizeof(uint64_t));
           /* Device voltage range supposed to be [2.7V to 3.6V], the operation will be done by word */
-          if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, current_dest,
-                                *((uint64_t *)(current_source + address_offset))) == HAL_OK)
+          if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, current_dest, src_value) == HAL_OK)
           {
             /* Check the written value */
-            if (*(uint64_t *)current_dest != *(uint64_t *)(current_source + address_offset))
+            if (*(uint64_t *)current_dest != src_value)
             {
               /* Flash content doesn't match SRAM content */
               ret_status = FLASH_IF_WRITE_ERROR;

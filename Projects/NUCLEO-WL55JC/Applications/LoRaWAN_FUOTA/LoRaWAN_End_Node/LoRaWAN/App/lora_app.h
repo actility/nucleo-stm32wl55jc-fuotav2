@@ -128,7 +128,13 @@ extern "C" {
 #define LORAWAN_DEFAULT_CLASS_B_C_RESP_TIMEOUT      8000
 
 /* USER CODE BEGIN EC */
-
+#if (ACTILITY_SMARTDELTA == 1)
+/*!
+ * Defines a random delay for application data transmission duty cycle. 5s,
+ * value in [ms].
+ */
+#define APP_TX_DUTYCYCLE_RND                        5000
+#endif /* ACTILITY_SMARTDELTA == 1 */
 /* USER CODE END EC */
 
 /* Exported macros -----------------------------------------------------------*/

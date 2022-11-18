@@ -52,12 +52,21 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 #if (INTEROP_TEST_MODE == 0)
+#if (ACTILITY_SMARTDELTA == 1)
+/**
+  * @brief  Run FW Update process.
+  * @param  [IN] reset Reset device after FW Update [1 - reset; 0 - keep running]
+  * @retval None
+  */
+void FwUpdateAgent_Run(bool reset);
+#else /* ACTILITY_SMARTDELTA == 0 */
 /**
   * @brief  Run FW Update process.
   * @param  None
   * @retval None
   */
 void FwUpdateAgent_Run(void);
+#endif /* ACTILITY_SMARTDELTA == 1 */
 #endif /* INTEROP_TEST_MODE == 0 */
 
 /* USER CODE BEGIN EFP */
