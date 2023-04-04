@@ -63,7 +63,7 @@ extern "C" {
 /*!
  * @brief LoRaWAN Keys integrated in KMS Middleware
  */
-#define LORAWAN_KMS                                     0
+#define LORAWAN_KMS                                     1
 
 /*!
  * @brief Enable the additional LoRaWAN packages
