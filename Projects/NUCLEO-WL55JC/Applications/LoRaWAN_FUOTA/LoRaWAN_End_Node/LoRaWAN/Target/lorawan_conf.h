@@ -63,7 +63,7 @@ extern "C" {
 /*!
  * @brief LoRaWAN Keys integrated in KMS Middleware
  */
-#define LORAWAN_KMS                                     1
+#define LORAWAN_KMS                                     0
 
 /*!
  * @brief Enable the additional LoRaWAN packages
@@ -89,7 +89,7 @@ extern "C" {
  *             - Fragmented Data Block Transport v2.0.0
  *             - Firmware Management Protocol v1.0.0
  */
-#define LORAWAN_PACKAGES_VERSION                        1
+#define LORAWAN_PACKAGES_VERSION                        2
 
 /* Region ------------------------------------*/
 /* the region listed here will be linked in the MW code */
