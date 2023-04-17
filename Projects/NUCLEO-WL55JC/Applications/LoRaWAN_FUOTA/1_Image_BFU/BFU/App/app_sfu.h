@@ -98,7 +98,7 @@ extern "C" {
   * Optional Features Software Configuration
   */
 #if !defined(SFU_TEST_PROTECTION)
-#define SECBOOT_LOADER SECBOOT_USE_NO_LOADER /* SECBOOT_USE_LOCAL_LOADER    /*!< Loader selection inside SBSFU : local/standalone/none */
+#define SECBOOT_LOADER SECBOOT_USE_NO_LOADER /* SECBOOT_USE_LOCAL_LOADER */    /*!< Loader selection inside SBSFU : local/standalone/none */
 #else
 #define SECBOOT_LOADER SECBOOT_USE_NO_LOADER       /*!< No loader usage forced when SFU_TEST_PROTECTION is set */
 #endif /* SFU_TEST_PROTECTION */

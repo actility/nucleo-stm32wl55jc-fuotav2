@@ -70,6 +70,8 @@ typedef struct LmhpFragmentationParams_s
 
 LmhPackage_t *LmhpFragmentationPackageFactory( void );
 
+uint32_t LmhpFragmentationGetTxDelay( void );
+
 #ifdef __cplusplus
 }
 #endif

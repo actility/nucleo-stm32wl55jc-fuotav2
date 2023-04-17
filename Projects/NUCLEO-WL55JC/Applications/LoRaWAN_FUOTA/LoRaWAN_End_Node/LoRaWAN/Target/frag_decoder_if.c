@@ -196,6 +196,14 @@ void FRAG_DECODER_IF_OnProgress(uint16_t fragCounter, uint16_t fragNb, uint8_t f
   /* USER CODE END FRAG_DECODER_IF_OnProgress_2 */
 }
 
+#if ACTILITY_SMARTDELTA == 1
+static void ResetDelayTimer_cb(void *context)
+{
+  APP_LOG(TS_OFF, VLEVEL_M, "\r\ndelayed fw update run...\r\n");
+  FwUpdateAgent_Run(true);
+}
+#endif
+
 void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
 {
   /* USER CODE BEGIN FRAG_DECODER_IF_OnDone_1 */
@@ -261,7 +269,16 @@ cleanup:
   LmHandlerRequestClass( CLASS_A );
   if ( LmhpFirmwareManagementIsRebootScheduled() != true &&
       LmhpFirmwareManagementGetImageStatus() == FW_MANAGEMENT_VALID_IMAGE) {
-	  FwUpdateAgent_Run(true);
+      uint32_t delay = LmhpFragmentationGetTxDelay();
+      APP_LOG(TS_OFF, VLEVEL_M, "\r\nfw update scheduled in %ums\r\n", delay);
+      if(delay) {
+        static TimerEvent_t ResetDelayTimer;
+        TimerInit(&ResetDelayTimer, ResetDelayTimer_cb);
+        TimerSetValue(&ResetDelayTimer, delay);
+        TimerStart(&ResetDelayTimer);
+      } else {
+        FwUpdateAgent_Run(true);
+      }
   }
 
 #endif /* ACTILITY_SMARTDELTA == 0 */
