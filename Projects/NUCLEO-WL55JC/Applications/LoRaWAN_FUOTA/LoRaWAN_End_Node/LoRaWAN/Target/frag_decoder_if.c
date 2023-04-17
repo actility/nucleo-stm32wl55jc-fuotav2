@@ -206,7 +206,6 @@ void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
 
 #if (INTEROP_TEST_MODE == 0)
   /* Do a request to Run the Secure boot - The file is already in flash */
-#if (LORAWAN_PACKAGES_VERSION == 1)
 #if (ACTILITY_SMARTDELTA == 0)
   /* Do a request to Run the Secure boot - The file is already in flash */
   FwUpdateAgent_Run();
@@ -254,6 +253,8 @@ void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
   /*
    * All fragments received and processed. Switch to Class A
    * and signal multicast session is finished
+   *
+   * TODO: Need to process delayed reboot
    */
 cleanup:
 
@@ -264,7 +265,6 @@ cleanup:
   }
 
 #endif /* ACTILITY_SMARTDELTA == 0 */
-#endif /* LORAWAN_PACKAGES_VERSION */
 
   *addr = FRAG_DECODER_DWL_REGION_START;
 #else

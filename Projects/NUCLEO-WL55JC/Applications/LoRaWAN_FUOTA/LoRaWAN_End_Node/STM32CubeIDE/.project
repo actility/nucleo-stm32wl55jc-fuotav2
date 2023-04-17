@@ -40,7 +40,7 @@
 		<link>
 			<name>Middlewares/SmartDelta</name>
 			<type>2</type>
-			<location>C:/Users/OlegTabarovskiy/STM32CubeIDE/fuota20/stm32cube_fw2_wl/Middlewares/Third_Party/SmartDelta</location>
+			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Utilities/stm32_adv_trace.c</name>
@@ -393,6 +393,36 @@
 			<locationURI>PARENT-2-PROJECT_LOC/1_Image_BFU/STM32CubeIDE/Debug/se_interface_app.o</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/SmartDelta/BSPATCH_BSDIFF_LICENSE.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/BSPATCH_BSDIFF_LICENSE.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/LICENCE_SLA0ACT.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/LICENCE_SLA0ACT.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/LZG_LICENSE.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/LZG_LICENSE.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/crypto</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/SubGHz_Phy/radio.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c</locationURI>
@@ -503,6 +533,111 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Drivers/BSP/STM32WLxx_Nucleo/stm32wlxx_nucleo_radio.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/SmartDelta/crypto/verify_signature.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/crypto/verify_signature.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/crypto/verify_signature.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/crypto/verify_signature.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/BSPATCH_BSDIFF_LICENSE.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/BSPATCH_BSDIFF_LICENSE.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/LICENCE_SLA0ACT.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/LICENCE_SLA0ACT.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/LZG_LICENSE.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/LZG_LICENSE.txt</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/Makefile</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/Makefile</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_bspatch32.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_bspatch32.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_bspatch32.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_bspatch32.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_decompress_lzg.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_decompress_lzg.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_decompress_lzg.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_decompress_lzg.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch_defs.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch_defs.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch_hash.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch_hash.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch_hash.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch_hash.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch_stream.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch_stream.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_patch_stream.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_patch_stream.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_storage.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_storage.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_storage.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_storage.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/src/fota_test.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/src/fota_test.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/KMS/App/app_kms.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/KMS/App/app_kms.c</locationURI>
@@ -541,6 +676,81 @@
 			<name>Application/User/LoRaWAN/Target/radio_board_if.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/LoRaWAN/Target/radio_board_if.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/Cheedoong-bsdiff</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota-pack_main.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota-pack_main.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota-unpack_main.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota-unpack_main.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota_misc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota_misc.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota_misc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota_misc.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota_patch.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota_patch.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/fota_patch.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/fota_patch.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/gitdescribe</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/gitdescribe</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/lzg_e</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/Cheedoong-bsdiff/LICENSE</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/Cheedoong-bsdiff/LICENSE</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/Cheedoong-bsdiff/bsdiff.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/Cheedoong-bsdiff/bsdiff.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/Cheedoong-bsdiff/bsdiff32.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/Cheedoong-bsdiff/bsdiff32.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/lzg_e/encode.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/lzg_e/encode.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/lzg_e/internal.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/lzg_e/internal.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SmartDelta/patchtools/src/lzg_e/lzg.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/SmartDelta/patchtools/src/lzg_e/lzg.h</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -49,7 +49,19 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+#ifdef SDTEST
+#include "app_version.h"
+void  test_runner(void);
+int testmode = 0;
+#if     APP_VERSION == 0x1030000
+char *__filler = "q"; /* asdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()_+-={}|:<>?[];',./"; /**/
+#elif   APP_VERSION == 0x1030100
+char *__filler = "qwertasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%"; /**/
+#else
+#error  "Invalid APP_VERSION"
+#endif
+static char __fillerstr[1];
+#endif /* SDTEST */
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -63,6 +75,9 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+#ifdef SDTEST
+  ((char volatile *)__fillerstr)[0] = __filler[0];
+#endif
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -88,7 +103,11 @@ int main(void)
   MX_KMS_Init();
   MX_LoRaWAN_Init();
   /* USER CODE BEGIN 2 */
-
+#ifdef SDTEST
+  if((int volatile)testmode) {
+    test_runner();
+  }
+#endif /* SDTEST */
   /* USER CODE END 2 */
 
   /* Infinite loop */
