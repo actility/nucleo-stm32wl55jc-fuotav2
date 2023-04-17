@@ -94,7 +94,6 @@ void FwUpdateAgent_Run(void)
 
   if (status == FLASH_IF_OK)
   {
-#if ( LORAWAN_PACKAGES_VERSION == 1 )
 #if (ACTILITY_SMARTDELTA == 1)
     if (reset) {
 #endif /* ACTILITY_SMARTDELTA == 1 */
@@ -103,7 +102,6 @@ void FwUpdateAgent_Run(void)
 #if (ACTILITY_SMARTDELTA == 1)
     }
 #endif /* ACTILITY_SMARTDELTA == 1 */
-#endif /* LORAWAN_PACKAGES_VERSION */
   }
   else
   {

@@ -227,6 +227,18 @@ static TimerEvent_t FragmentProcessTimer;
 static uint8_t BlockAckDelay = 0;
 
 #if ( FRAGMENTATION_VERSION == 2 )
+/*!
+ * Number of milliseconds between retries on Tx failure
+ */
+#define FRAG_RETRY_TIMER	3000
+
+/*!
+ * Number of times retry to send FragDataSentReq on boot if failed
+ */
+#define FRAGDATABLOCK_RETRY_COUNT	3
+
+static int TxRetryCount;
+
 /* fragmentation counter session */
 static int32_t SessionCntPrev[FRAGMENTATION_MAX_SESSIONS] = {-1, -1, -1, -1};
 #endif /* FRAGMENTATION_VERSION */
@@ -257,6 +269,7 @@ static void LmhpFragmentationInit( void *params, uint8_t *dataBuffer, uint8_t da
         TxDelayTime = 0;
         /* Initialize Fragmentation delay timer. */
         TimerInit( &FragmentProcessTimer, OnFragmentProcessTimer );
+        TxRetryCount = 0;
     }
     else
     {
@@ -281,6 +294,12 @@ static bool LmhpFragmentationIsTxPending( void )
 
 static void LmhpFragmentationProcess( void )
 {
+	/*
+	 * TODO: Need to rewrite processing of FragDataBlockReq because now it is being
+	 * resent once every second until Ans is received which violates spec.
+	 * Random delay retry could overlap with new command in this package and this should
+	 * be prevented.
+	 */
     if( LmhpFragmentationState.IsTxPending == true )
     {
         /* Send the reply. */
@@ -293,21 +312,25 @@ static void LmhpFragmentationProcess( void )
 
         LmHandlerErrorStatus_t lmhStatus = LORAMAC_HANDLER_ERROR;
         lmhStatus = LmHandlerSend( &appData, LORAMAC_HANDLER_UNCONFIRMED_MSG, true );
-#if ( FRAGMENTATION_VERSION == 2 )
-        if( ( lmhStatus == LORAMAC_HANDLER_BUSY_ERROR ) || ( lmhStatus == LORAMAC_HANDLER_DUTYCYCLE_RESTRICTED )
-            || ( LmhpFragmentationState.FragDataBlockAnsRequired == true ) )
-#else
+        /* set it back in timer processing OnFragmentProcessTimer() */
+        LmhpFragmentationState.IsTxPending = false;
         if( ( lmhStatus == LORAMAC_HANDLER_BUSY_ERROR ) || ( lmhStatus == LORAMAC_HANDLER_DUTYCYCLE_RESTRICTED ) )
-#endif /* FRAGMENTATION_VERSION */
         {
             /* try to send the message again */
-            TimerSetValue( &FragmentProcessTimer, 1000 );
+            TimerSetValue( &FragmentProcessTimer, FRAG_RETRY_TIMER );
             TimerStart( &FragmentProcessTimer );
         }
-        else
+        else if ( ( LmhpFragmentationState.FragDataBlockAnsRequired == true )
+        		&& (TxRetryCount < FRAGDATABLOCK_RETRY_COUNT) )
         {
-            LmhpFragmentationState.IsTxPending = false;
+            TxDelayTime = randr( 0, 1000 ) * ( 1 << ( BlockAckDelay + 4 ) );
+            TimerSetValue( &FragmentProcessTimer, TxDelayTime );
+            TimerStart( &FragmentProcessTimer );
+            TxRetryCount++;
+        } else {
             LmhpFragmentationState.DataBufferSize = 0;
+            LmhpFragmentationState.FragDataBlockAnsRequired = false;
+            TxRetryCount = 0;
         }
     }
 }
@@ -495,6 +518,7 @@ static void LmhpFragmentationOnMcpsIndication( McpsIndication_t *mcpsIndication 
                         LmhpFragmentationState.IsTxPending = false;
                         LmhpFragmentationState.DataBufferSize = 0;
                         LmhpFragmentationState.FragDataBlockAnsRequired = false;
+                        TxRetryCount = 0;
                     }
                     break;
                 }
@@ -509,9 +533,11 @@ static void LmhpFragmentationOnMcpsIndication( McpsIndication_t *mcpsIndication 
 
                     fragIndex = ( fragCounter >> 14 ) & 0x03;
                     fragCounter &= 0x3FFF;
+                    MW_LOG( TS_ON, VLEVEL_M, "DATA FRAGMENT #: %d SESSION: %d\r\n", fragCounter, fragIndex );
                     if( FragSessionData[fragIndex].FragGroupData.IsActive == false )
                     {
-                        cmdIndex = mcpsIndication->BufferSize;
+                    	MW_LOG( TS_ON, VLEVEL_M, "Non-existent session #: %d\r\n", fragIndex );
+                    	cmdIndex = mcpsIndication->BufferSize;
                         break;
                     }
                     if( mcpsIndication->Multicast == 1 )
@@ -553,6 +579,7 @@ static void LmhpFragmentationOnMcpsIndication( McpsIndication_t *mcpsIndication 
                             }
 
 #if ( FRAGMENTATION_VERSION == 2 )
+                            MW_LOG( TS_OFF, VLEVEL_M, "Frag onDone completed\r\n" );
                             /*If AckReception = 0, the end-device SHALL do nothing */
                             if( FragSessionData[fragIndex].FragGroupData.Control.Fields.AckReception == 1 )
                             {
@@ -569,14 +596,21 @@ static void LmhpFragmentationOnMcpsIndication( McpsIndication_t *mcpsIndication 
                                                                fragIndex,
                                                                FragSessionData[fragIndex].FragGroupData.Descriptor,
                                                                &micComputed );
+                                MW_LOG( TS_OFF, VLEVEL_M, "len: %d sessioncnt: %d fragindex: %d, desc: %d\r\n",
+                                     FragSessionData[fragIndex].FragGroupData.FragNb * FragSessionData[fragIndex].FragGroupData.FragSize -
+                                         FragSessionData[fragIndex].FragGroupData.Padding,
+		                                    FragSessionData[fragIndex].FragGroupData.SessionCnt,
+		                                        fragIndex,
+		                                           FragSessionData[fragIndex].FragGroupData.Descriptor);
                                 MW_LOG( TS_OFF, VLEVEL_M, "MIC         : %08X\r\n", micComputed );
 
                                 /* check if the MIC computed is equal to the MIC received */
+#if 0 /* Correct MIC computation for arbitrary length data blocks currently is not supported by LoRaMacProcessMicForDatablock() */
                                 if( micComputed != FragSessionData[fragIndex].FragGroupData.Mic )
                                 {
                                     status |= 0x04;
                                 }
-
+#endif /* TODO: Compare MIC when right LoRaMacProcessMicForDatablock() will be available */
                                 LmhpFragmentationState.DataBuffer[dataBufferIndex++] = FRAGMENTATION_FRAG_DATA_BLOCK_RECEIVED_REQ;
                                 LmhpFragmentationState.DataBuffer[dataBufferIndex++] = status;
                                 BlockAckDelay = FragSessionData[fragIndex].FragGroupData.Control.Fields.BlockAckDelay;
