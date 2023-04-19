@@ -220,7 +220,6 @@ void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
 #else  /* ACTILITY_SMARTDELTA == 1 */
 
   uint8_t *datafile = (uint8_t *)FOTA_DWL_REGION_START;
-  uint32_t fwsize;
 
   if( *(uint32_t *)datafile != FIRMWARE_MAGIC)
   {
@@ -235,9 +234,9 @@ void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
   }
   if( fota_patch_verify_header(datafile) == SMARTDELTA_OK )
   {
-    fwsize = size - SFU_IMG_IMAGE_OFFSET;
-    if( 1 /* fota_patch_verify_signature (datafile, fwsize) == SMARTDELTA_OK */) {
-
+#ifndef NO_CRYPTO
+    if( fota_patch_verify_signature (datafile, size - SFU_IMG_IMAGE_OFFSET) == SMARTDELTA_OK ) {
+#endif
       APP_LOG(TS_OFF, VLEVEL_M, "Patch size: %u\r\n", size);
       fota_patch_result_t patch_res = fota_patch(size);
       if (patch_res == fotaOk) {
@@ -250,10 +249,12 @@ void FRAG_DECODER_IF_OnDone(int32_t status, uint32_t size, uint32_t *addr)
         LmhpFirmwareManagementSetImageStatus(FW_MANAGEMENT_CORRUPTED_IMAGE);
         APP_LOG(TS_OFF, VLEVEL_M, "Patch error:%d\r\n", patch_res);
       }
+#ifndef NO_CRYPTO
     } else {
       APP_LOG(TS_OFF, VLEVEL_M, "Invalid Smart Delta signature\r\n");
       LmhpFirmwareManagementSetImageStatus(FW_MANAGEMENT_INCOMPATIBLE_IMAGE);
     }
+#endif
   } else { /* Process full image upgrade */
     LmhpFirmwareManagementSetImageStatus(FW_MANAGEMENT_VALID_IMAGE);
     APP_LOG(TS_OFF, VLEVEL_M, "\r\n...... Full image received OK ......\r\n");
