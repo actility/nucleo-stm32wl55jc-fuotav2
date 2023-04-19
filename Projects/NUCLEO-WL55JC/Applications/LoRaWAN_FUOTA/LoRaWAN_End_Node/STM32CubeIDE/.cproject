@@ -72,12 +72,12 @@
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/STM32_Key_Management_Services/Core"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/STM32_Key_Management_Services/iKMS"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/STM32_Key_Management_Services/Interface"/>
-									<listOptionValue builtIn="false" value="../../../1_Image_SECoreBin/Inc"/>
-									<listOptionValue builtIn="false" value="../../../1_Image_BFU/BFU/App"/>
-									<listOptionValue builtIn="false" value="../../../Linker_Common/STM32CubeIDE"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/Third_Party/SmartDelta/crypto"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/Third_Party/SmartDelta/src"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Middlewares/Third_Party/mbed-crypto/include"/>
+									<listOptionValue builtIn="false" value="../../../1_Image_SECoreBin/Inc"/>
+									<listOptionValue builtIn="false" value="../../../1_Image_BFU/BFU/App"/>
+									<listOptionValue builtIn="false" value="../../../Linker_Common/STM32CubeIDE"/>
 								</option>
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.fdata.1985855385" name="Place data in their own sections (-fdata-sections)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.fdata" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.328304571" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
