@@ -20,6 +20,8 @@ Description: Smart Delta RMC server ECDSA signature verification
 #define SMARTDELTA_ERROR				-1
 #define SMARTDELTA_OK					0
 
+#define NO_CRYPTO       /* Do not use cryptographic verification of signature to reduce images size. WL55 only */
+
 /**
   * @brief Smart Delta patch verify signature function.
   *        Authenticates the Smart Delta patch with header.
