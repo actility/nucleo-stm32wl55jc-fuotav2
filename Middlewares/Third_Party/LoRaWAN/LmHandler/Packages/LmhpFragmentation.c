@@ -571,17 +571,17 @@ static void LmhpFragmentationOnMcpsIndication( McpsIndication_t *mcpsIndication 
                             uint32_t UnfragmentedBufferAddr;
                             /* Fragmentation successfully done */
 
-                            // the same calculation may evaluate blockAckDelay and TxDelayTime in other fragmentation scenarios (see code in this file),
-                            // but here they will be overwrite
-                            // Fetch the co-efficient value required to calculate delay of that respective session.
+                            /* the same calculation may evaluate blockAckDelay and TxDelayTime in other fragmentation scenarios (see code in this file),
+                            but here they will be overwrite */
+                            /* Fetch the co-efficient value required to calculate delay of that respective session. */
                             BlockAckDelay = FragSessionData[fragIndex].FragGroupData.Control.Fields.BlockAckDelay;
-                            // Delay value is calculated using BlockAckDelay which is communicated by server during the FragSessionSetupReq
-                            // Pseudo Random Delay = rand(0:1) * 2^(blockAckDelay + 4) Seconds.
-                            // Delay = Pseudo Random Delay * 1000 milli seconds.
-                            // Eg: blockAckDelay = 7
-                            //     Pseudo Random Delay = rand(0:1) * 2^11
-                            //     rand(0:1) seconds = rand(0:1000) milliseconds
-                            //     Delay = rand(0:1000) * 2048 => 2048000ms = 34 minutes
+                            /* Delay value is calculated using BlockAckDelay which is communicated by server during the FragSessionSetupReq */
+                            /* Pseudo Random Delay = rand(0:1) * 2^(BlockAckDelay + 4) Seconds. */
+                            /* Delay = Pseudo Random Delay * 1000 milli seconds. */
+                            /* Eg: BlockAckDelay = 7 */
+                            /*     Pseudo Random Delay = rand(0:1) * 2^11 */
+                            /*     rand(0:1) seconds = rand(0:1000) milliseconds */
+                            /*     Delay = rand(0:1000) * 2048 => 2048000ms = 34 minutes */
                             TxDelayTime = randr( 0, 1000 ) * ( 1 << ( BlockAckDelay + 4 ) );
 
                             if( LmhpFragmentationParams->OnDone != NULL )
