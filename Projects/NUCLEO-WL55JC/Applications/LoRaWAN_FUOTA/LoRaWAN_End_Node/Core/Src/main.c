@@ -54,7 +54,7 @@ void SystemClock_Config(void);
 void  test_runner(void);
 int testmode = 0;
 #if     APP_VERSION == 0x1030000
-char *__filler = "q"; /* asdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()_+-={}|:<>?[];',./"; /**/
+char *__filler = "q"; /* asdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()_+-={}|:<>?[];',./"; */ /**/
 #elif   APP_VERSION == 0x1030100
 char *__filler = "qwertasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%"; /**/
 #else
